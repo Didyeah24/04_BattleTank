@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/World.h"
 #include "Tank.h"
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
@@ -30,10 +31,15 @@ private:
 
 	bool GetLookDirection(FVector2D ScreenLocation, FVector& WorldDirection) const;
 
+	bool GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const;
+
 	UPROPERTY(EditAnywhere)
 	double CrossHairXLocation = 0.5;
 
 	UPROPERTY(EditAnywhere)
 	double CrossHairYLocation = (1.0 / 3.0);
+
+	UPROPERTY(EditAnywhere)
+	double LineTraceRange = 1000000;
 	
 };
