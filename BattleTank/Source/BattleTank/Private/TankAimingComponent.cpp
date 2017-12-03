@@ -2,12 +2,17 @@
 
 #include "TankAimingComponent.h"
 #include "TankBarrel.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
+#include "Math/Color.h"
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
+	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true; // TODO Should it really tick?
 
 	// ...
@@ -24,23 +29,34 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 
 	FVector OutLaunchVelocity;
 	FVector StartLocation = Barrel->GetSocketLocation("Projectile");
-	bool hasAimSolution = UGameplayStatics::SuggestProjectileVelocity(
-							this,
-							OutLaunchVelocity,
-							StartLocation,
-							HitLocation,
-							LaunchSpeed,
-							ESuggestProjVelocityTraceOption::DoNotTrace);
+	bool bHaveAimSolution = UGameplayStatics::SuggestProjectileVelocity
+	(
+		this,
+		OutLaunchVelocity,
+		StartLocation,
+		HitLocation,
+		LaunchSpeed,
+		false,
+		0,
+		0
+		,ESuggestProjVelocityTraceOption::DoNotTrace
+	);
 
-	if (hasAimSolution) {
+	bHaveAimSolution = (HitLocation.Z != -10);
+
+	auto Time = GetWorld()->GetTimeSeconds();
+	UE_LOG(LogTemp, Warning, TEXT("%f: HitLocation.Z = %f"), Time, HitLocation.Z);
+
+	FColor traceColor = FColor(1);
+	DrawDebugLine(GetWorld(), StartLocation, HitLocation, traceColor);
+
+	if (bHaveAimSolution) {
 		FVector AimDirection = OutLaunchVelocity.GetSafeNormal();
 		MoveBarrelTowards(AimDirection);
-		auto Time = GetWorld()->GetTimeSeconds();
 		UE_LOG(LogTemp, Warning, TEXT("%f: Aim solution found"), Time);
 	}
 	else
 	{
-		auto Time = GetWorld()->GetTimeSeconds();
 		UE_LOG(LogTemp, Warning, TEXT("%f: No aim solution found"), Time);
 	}
 }
