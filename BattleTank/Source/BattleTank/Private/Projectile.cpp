@@ -28,7 +28,6 @@ void AProjectile::Tick(float DeltaTime)
 }
 
 void AProjectile::LaunchProjectile(float Speed) {
-	UE_LOG(LogTemp, Warning, TEXT("Fire!"));
 	ProjectileMovementComponent->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
 	ProjectileMovementComponent->Activate();
 }
